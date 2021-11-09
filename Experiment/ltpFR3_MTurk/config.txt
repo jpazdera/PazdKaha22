@@ -1,0 +1,37 @@
+[HIT Configuration]
+title = Word Recall Memory Experiment (50-60 minutes)
+description = Try to remember as many words as you can! Please note that ad blockers must be paused/disabled for the HIT to appear.
+amt_keywords = memory, psychology, experiment, recall, remember, free recall, episodic
+lifetime = 36
+us_only = true
+approve_requirement = 95
+contact_email_on_error = kahanalab@gmail.com
+ad_group = ltpFR3
+psiturk_keywords = memory, psychology, experiment, recall, remember, free recall, episodic
+organization_name = University of Pennsylvania
+browser_exclude_rule = MSIE, Safari/6, mobile, tablet, bot
+allow_repeats = false
+
+[Database Parameters]
+database_url = sqlite:///ltpFR3.db
+table_name = ltpFR3
+
+[Server Parameters]
+host = 0.0.0.0
+port = 22362
+cutoff_time = 150
+logfile = server_log.txt
+loglevel = 2
+debug = false
+login_username = none
+login_pw = none
+threads = 50
+
+[Task Parameters]
+experiment_code_version = 2.0
+num_conds = 2
+num_counters = 3000
+
+[Shell Parameters]
+launch_in_sandbox_mode = false
+use_psiturk_ad_server = true

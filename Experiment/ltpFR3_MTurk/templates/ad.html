@@ -1,0 +1,158 @@
+<!doctype html>
+<!--
+	The ad.html has a very specific format.
+
+	Really there are two "ads" contained within this file.
+
+	The first ad displays to participants who are browsing
+	the Amazon Mechanical Turk site but have not yet accepted
+	your hit.
+
+	The second part of the ad displays after the person selected
+	"Accept HIT" on the Amazon website. This will reload the
+	ad and will display a button which, when clicked, will pop
+	open a new browser window pointed at your local psiTurk
+	server (assuming it is running and accessible to the Internet).
+
+	See comments throughout for hints
+
+-->
+<html>
+	<head>
+		<title>ltpFR3</title>
+		<link rel=stylesheet href="/static/css/bootstrap.min.css" type="text/css">
+		<style>
+			/* these styles need to be defined locally */
+			body {
+			    padding:0px;
+			    margin: 0px;
+			    background-color: white;
+			    color: black;
+			    font-weight: 300;
+			    font-size: 13pt;
+			}
+
+			/* ad.html  - the ad that people view first */
+			#adlogo {
+			    float: right;
+			    width: 140px;
+			    padding: 2px;
+			    border: 1px solid #ccc;
+			}
+
+			#container-ad {
+			    position: absolute;
+			    top: 0px; /* Header Height */
+			    bottom: 0px; /* Footer Height */
+			    left: 0px;
+			    right: 0px;
+			    padding: 100px;
+			    padding-top: 5%;
+			    border: 18px solid #f3f3f3;
+			    background: white;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="container-ad">
+
+			<div id="ad">
+				<div class="row">
+					<div class="col-xs-2">
+						<!-- REPLACE THE LOGO HERE WITH YOUR  UNIVERSITY, LAB, or COMPANY -->
+						<img id="adlogo" src="https://upload.wikimedia.org/wikipedia/en/thumb/6/6a/UPenn_logo.svg/1280px-UPenn_logo.svg.png" alt="Lab Logo" />
+						<!--<img id="adlogo" src="https://thumb.ibb.co/iGNnf5/pennmem.png" alt="Lab Logo" />-->
+					</div>
+					<div class="col-xs-10">
+
+							<!--
+								If assignmentid is "ASSIGNMENT_ID_NOT_AVAILABLE"
+								it means the participant has NOT accepted your hit.
+								This should display the typical advertisement about
+								your experiment: who can participate, what the
+								payment is, the time, etc...
+
+							-->
+							{% if assignmentid == "ASSIGNMENT_ID_NOT_AVAILABLE" %}
+
+							    <h1>Call for participants</h1>
+							    <p>
+									The Computational Memory Lab at the University of Pennsylvania
+									Psychology Department is seeking online participants for a
+									research study that will investigate human memory. The only
+									requirements are that you are a native English speaker and
+									that you are at least 18 years old.
+									</p>
+									<p>
+									Participants will be asked to learn and remember lists of
+									printed and spoken words. The task will take appoximately
+									50-60 minutes, not counting time spent resting between
+									lists, and will pay $7.50.
+							    </p>
+									<p>
+									Please contact us by email at kahanalab@gmail.com with
+									any questions.
+									</p>
+									<p style="font-weight:500;">
+									Note that this task contains some auditory stimuli, and
+									cannot be completed without headphones or speakers.
+									</p>
+									<!--
+							    <div class="alert alert-danger" style='background-color: #d6eef9; border-color: #d6eef9; color: black'>
+									This task can only be completed once.<br><br>
+									If you have already completed this task, the system will not
+									allow you to run it again. If this task looks familiar, please
+									return the HIT to allow someone else to participate.<br><br>
+									Otherwise, click the "Accept HIT" button on the MTurk to continue.
+									</div>
+									-->
+							    <p>
+
+									</p>
+
+
+							{% else %}
+
+								<!--
+									OTHERWISE
+									If assignmentid is NOT "ASSIGNMENT_ID_NOT_AVAILABLE"
+									it means the participant has accepted your hit.
+									You should thus show them instructions to begin the
+									experiment ... usually a button to launch a new browser
+									window pointed at your server.
+
+									It is important you do not change the code for the
+									openwindow() function below if you want you experiment
+									to work.
+								-->
+							    <h1>Thank you for accepting this HIT</h1>
+							    <p>
+							    	By clicking the button below, you will be taken to a
+										consenting page, which will give you some basic information
+										about the experiment before you begin. From there, you will
+										be able to decide whether or not you wish to participate in
+										our study.
+							    </p>
+							    <script>
+									function openwindow() {
+							    		popup = window.open('{{ server_location }}/consent?hitId={{ hitid }}&assignmentId={{ assignmentid }}&workerId={{ workerid }}','Popup','toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=no,width='+screen.width+',height='+screen.height+'');
+							  		}
+							    </script>
+							    <div class="alert alert-warning">
+							    	<b>Warning</b>: Please disable pop-up blockers before continuing.
+							    </div>
+
+						    	<button type="button" class="btn btn-primary btn-lg" onClick="openwindow();">
+								  Continue
+								</button>
+
+
+							{% endif %}
+							<!--
+								endif
+							-->
+					</div>
+			</div>
+		</div>
+	</body>
+</html>

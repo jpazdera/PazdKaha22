@@ -1,0 +1,42 @@
+#inst {
+  font-family: 'Open Sans', 'Arial', sans-serif;
+  font-size: 30px;
+  line-height: 1.6em;
+}
+
+#stim {
+  font-family: 'Open Sans', 'Arial', sans-serif;
+  font-size: 80px;
+  line-height: 1.6em;
+}
+
+#recall_box {
+  font-family: 'Open Sans', 'Arial', sans-serif;
+  font-size: 50px;
+  resize: none;
+  overflow: hidden;
+  width: 400px;
+  height: 55px;
+}
+
+#math_box {
+  font-family: 'Open Sans', 'Arial', sans-serif;
+  font-size: 50px;
+  resize: none;
+  overflow: hidden;
+  width: 100px;
+  height: 55px;
+}
+
+body {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+audio {
+	width:260px;
+    overflow: hidden;
+    direction: ltl;
+    border-top-right-radius: 0.5em 0.5em;
+    border-bottom-right-radius: 1em 0.7em;
+}
