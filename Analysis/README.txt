@@ -8,7 +8,7 @@ files in Data/stats/.
 
 json_to_csv.ipynb:
 Contains code for aggregating data from all participants' data and stats JSON files (see Data 
-directory) into a table of recall data and a table of intrusion data, to be analyzed in R. The
+directory) into a table of recall data and a table of intrusion data, to be analyzed in R.
 
 ltpFR3_stats.R:
 Contains code for all statistical analyses of Experiments 1 and 2.
