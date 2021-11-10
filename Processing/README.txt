@@ -18,7 +18,7 @@ major components.
 4) Automatically calculate a wide range of behavioral performance statistics using a combination
     of pybeh functions and custom scripts. Store this information in JSON files labeled "stats".
     Then calculate average behavioral stats across all participants. This process is handled by 
-    run_stats.run_stats().
+    run_stats.run_stats(). (See https://github.com/pennmem/pybeh for the Python Behavioral Toolbox).
 
 5) Generate a PDF report for each participant, along with an aggregate report across all
     participants. These reports contain a variety of the stats calculated in Component 4, and allow
