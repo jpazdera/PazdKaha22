@@ -102,8 +102,6 @@ Anova(model, type=3)  # All 3 main effects, no interactions
 # Model Testing - PFR-L4 ~ Modality x List Length X Pres Rate
 ###
 
-options(contrasts=c("contr.sum","contr.poly"))
-
 # E1
 model = glmer(l4_start ~ 1 + modality * list_length * pres_rate + (1|subject), data=e1_data,
               family='binomial', control=glmerControl(optimizer = "bobyqa"))
@@ -133,13 +131,15 @@ summary(model)
 ###
 
 # E1
-model = glmer(primacy ~ 1 + modality * start_type + (1|subject), data=e1_data,
+model = glmer(primacy ~ 1 + modality * start_type + (1|subject), 
+              data=e1_data[e1_data$start_type != 'Other',],
               family='binomial', control=glmerControl(optimizer = "bobyqa"))
 summary(model)
 Anova(model, type=3)
 
 # E2
-model = glmer(primacy ~ 1 + modality * start_type + (1|subject), data=e2_data,
+model = glmer(primacy ~ 1 + modality * start_type + (1|subject), 
+              data=e2_data[e2_data$start_type != 'Other',],
               family='binomial', control=glmerControl(optimizer = "bobyqa"))
 summary(model)
 Anova(model, type=3)
@@ -149,16 +149,16 @@ Anova(model, type=3)
 # Model Testing - Recency ~ Modality x Start Position
 ###
 
-options(contrasts=c("contr.sum","contr.poly"))
-
 # E1
-model = glmer(recency ~ 1 + modality * start_type + (1|subject), data=e1_data,
+model = glmer(recency ~ 1 + modality * start_type + (1|subject), 
+              data=e1_data[e1_data$start_type != 'Other',],
               family='binomial', control=glmerControl(optimizer = "bobyqa"))
 summary(model)
 Anova(model, type=3)
 
 # E2
-model = glmer(recency ~ 1 + modality * start_type + (1|subject), data=e2_data,
+model = glmer(recency ~ 1 + modality * start_type + (1|subject), 
+              data=e2_data[e2_data$start_type != 'Other',],
               family='binomial', control=glmerControl(optimizer = "bobyqa"))
 summary(model)
 Anova(model, type=3)
