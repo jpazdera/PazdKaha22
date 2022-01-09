@@ -519,7 +519,7 @@ def run_pso(data_pres, sessions, w2v, sources, targets, sim_name=''):
     
     #    [ b_e,  b_r, g_fc, g_cf, p_s, p_d,  k,  e, s_cf, b_rp,  o,  a, c_t,   l]
     lb = [  .1,    0,    0,  .15,   0,   0,  0,  0,   .5,    0,  5, .5,   0,   0]
-    ub = [  .9,    1,    1,  .85,   8,   5, .5, .5,    3,    1, 20,  1,  .5, .25]
+    ub = [  .9,    1,    1,  .85,   8,   5, .5, .25,    3,    1, 20,  1,  .5, .25]
     
     print('Generating noise files...')
     make_noise(swarmsize, n_iter, lb, ub, NOISE_DIR)

@@ -17,14 +17,12 @@ cimport cython
 
 """
 Known differences from Lynn Lohnas's code:
-1) Cycle counter starts at 0 in this code instead of 1 during leaky accumulator (minimal effect)
-2) No empty feature vector is presented to the model in this code when the leaky accumulator recalls
-nothing at the end of each recall period.
+1) Cycle counter starts at 0 in this code instead of 1 during leaky accumulator.
+2) No empty feature vector is presented at the end of the recall period.
 """
 
 
-# Credit to "senderle" for the cython random number generation functions used
-# below. Original code can be found at:
+# Credit to "senderle" for the cython random number generation functions used below. Original code can be found at:
 # https://stackoverflow.com/questions/42767816/what-is-the-most-efficient-and-portable-way-to-generate-gaussian-random-numbers
 @cython.cdivision(True)
 cdef double random_uniform():
@@ -231,8 +229,8 @@ class CMR2(object):
         
         # Calculate dt_tau and its square root based on dt
         self.params['dt_tau'] = self.params['dt'] / 1000.  
-        self.params['sq_dt_tau'] = (self.params['dt'] / 1000.) ** .5
-
+        self.params['sq_dt_tau'] = np.sqrt(self.params['dt_tau'])
+ 
         ##########
         #
         # Initialize variables for tracking simulation progress
@@ -263,9 +261,12 @@ class CMR2(object):
         # Assume source context changes at same rate as temporal between trials
         self.phase = 'pretrial'
         self.serial_position = 0
-        self.beta = self.params['beta_enc'] if self.trial_idx == 0 else self.params['beta_rec_post']
-        self.beta_source = self.params['beta_source'] if self.nsources > 0 and self.trial_idx == 0 else self.params['beta_rec_post']
-        self.present_item(self.distractor_idx, source=None, update_context=True, update_weights=False)
+        self.beta = 1 if self.trial_idx == 0 else self.params['beta_rec_post']
+        self.beta_source = 1 if self.trial_idx == 0 else self.params['beta_rec_post']
+        # Treat initial source and intertrial source as an even mixture of all sources
+        #source = np.zeros(self.nsources) if self.nsources > 0 else None
+        source = self.sources[self.trial_idx, self.serial_position] if self.nsources > 0 else None
+        self.present_item(self.distractor_idx, source, update_context=True, update_weights=False)
         self.distractor_idx += 1
 
         ##########
@@ -280,7 +281,7 @@ class CMR2(object):
             if not self.nonzero_mask[self.trial_idx, self.serial_position]:  
                 continue
             pres_idx = self.pres_indexes[self.trial_idx, self.serial_position]
-            source = self.sources[self.trial_idx, self.serial_position] if self.nsources > 0 else 0
+            source = self.sources[self.trial_idx, self.serial_position] if self.nsources > 0 else None
             self.beta = self.params['beta_enc']
             self.beta_source = self.params['beta_source'] if self.nsources > 0 else 0
             self.present_item(pres_idx, source, update_context=True, update_weights=True)
@@ -296,7 +297,11 @@ class CMR2(object):
             self.beta = self.params['beta_distract']
             # Assume source context changes at the same rate as temporal during distractors
             self.beta_source = self.params['beta_distract']
-            self.present_item(self.distractor_idx, source=None, update_context=True, update_weights=False)
+            # By default, treat distractor source as an even mixture of all sources
+            # [If your distractors and sources are related, you should modify this so that you can specify distractor source.]
+            #source = np.zeros(self.nsources) if self.nsources > 0 else None
+            source = self.sources[self.trial_idx, self.serial_position] if self.nsources > 0 else None
+            self.present_item(self.distractor_idx, source, update_context=True, update_weights=False)
             self.distractor_idx += 1
         
         ##########
@@ -322,7 +327,8 @@ class CMR2(object):
         associative matrices after presentation.
         
         :param item_idx: The index of the cell within the feature vector that
-            should be activated by the presented item.
+            should be activated by the presented item. If None, presents an
+            empty feature vector.
         :param source: If None, no source features will be activated. If a 1D
             array, the source features in the feature vector will be set to
             match the numbers in the source array.
@@ -339,10 +345,11 @@ class CMR2(object):
         # Activate item's features
         #
         ##########
-
+        
         # Activate the presented item itself
         self.f.fill(0)
-        self.f[item_idx] = 1
+        if item_idx is not None:
+            self.f[item_idx] = 1
 
         # Activate the source feature(s) of the presented item
         if self.nsources > 0 and source is not None:
@@ -358,7 +365,7 @@ class CMR2(object):
 
             # Compute c_in
             self.c_in = np.dot(self.M_FC, self.f)
-
+            
             # Normalize the temporal and source subregions of c_in separately
             norm_t = np.sqrt(np.sum(self.c_in[:self.ntemporal] ** 2))
             if norm_t != 0:
@@ -367,7 +374,6 @@ class CMR2(object):
                 norm_s = np.sqrt(np.sum(self.c_in[self.ntemporal:] ** 2))
                 if norm_s != 0:
                     self.c_in[self.ntemporal:] /= norm_s
-
             # Set beta separately for temporal and source subregions
             beta_vec = np.empty_like(self.c)
             beta_vec[:self.ntemporal] = self.beta
@@ -486,8 +492,10 @@ class CMR2(object):
         # Pre-scale inhibition (lambda) based on dt
         cdef float lamb = self.params['lamb']
         lamb *= dt_tau
-        # Pre-scale eta based on dt
-        cdef float eta = self.params['eta']
+        # Take sqrt(eta) and pre-scale it based on sqrt(dt_tau)
+        # Note that we do this because (for cythonization purposes) we multiply the noise 
+        # vector by sqrt(eta), rather than directly setting the SD to eta
+        cdef float eta = self.params['eta'] ** .5
         eta *= sq_dt_tau
         # Pre-scale incoming activation based on dt
         np_in_act_scaled = np.empty(nitems_in_race, dtype=np.float32)
@@ -526,8 +534,6 @@ class CMR2(object):
             noise_vec = cython_randn(nitems_in_race)
             i = 0
             while i < nitems_in_race:
-                # Based on Lohnas et al. (2015) code, this is equivalent to her equation A7: (1 - tK - tLN)x + t*in_act + noise
-                # when N = (sum(x) - x) / x, but avoids division by zero when one or more items have zero activation.
                 # Note that kappa, lambda, eta, and in_act have all been pre-scaled above based on dt
                 x[i] += in_act_scaled[i] + (eta * noise_vec[i]) - (kappa * x[i]) - (lamb * (sum_x - x[i]))
                 x[i] = max(x[i], 0)
@@ -628,9 +634,9 @@ def make_params(source_coding=False):
         param_dict['L_FC_sfsc'] = 0  # Scale of sources reinstating past source contexts (Defaults to 0)
         
         param_dict['L_CF_tctf'] = None  # Scale of temporal context cueing past items (Recommend setting to gamma CF)
-        param_dict['L_CF_sctf'] = None  # Scale of temporal context cueing past sources features (Recommend setting to gamma CF)
-        param_dict['L_CF_tcsf'] = 0  # Scale of source context cueing past items (Defaults 0)
-        param_dict['L_CF_scsf'] = 0  # Scale of source context cueing past sources (Defaults to 0)
+        param_dict['L_CF_sctf'] = None  # Scale of source context cueing past items (Recommend setting to gamma CF or fitting as gamma source)
+        param_dict['L_CF_tcsf'] = 0  # Scale of temporal context cueing past sources (Defaults to 0, since model does not recall sources)
+        param_dict['L_CF_scsf'] = 0  # Scale of source context cueing past sources (Defaults to 0, since model does not recall sources)
     
     return param_dict
 
