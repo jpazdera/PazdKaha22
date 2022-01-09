@@ -1,4 +1,4 @@
-# PazdKaha22
+# Modality Effects in Free Recall: A Retrieved-Context Account
 Data and code for Pazdera &amp; Kahana (2022).
 
 The following is an overview of the data and code included herein:
