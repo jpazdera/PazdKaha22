@@ -1,5 +1,6 @@
 # Modality Effects in Free Recall: A Retrieved-Context Account
-Data and code for Pazdera &amp; Kahana (2022).
+Data and code for Pazdera &amp; Kahana (2022). A preprint of this paper has been made available at <https://doi.org/10.31234/osf.io/cxewq>,
+and all code, data, and supplemental materials can also be found on the Open Science Framework at <https://osf.io/4rz7k/>.
 
 The following is an overview of the data and code included herein:
 - /Analysis/: Python and R code used for generating figures, organizing data for analysis, and running statistical tests.
