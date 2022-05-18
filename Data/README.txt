@@ -120,7 +120,7 @@ DATA FILE SUMMARY
 - w2v.txt: 
 
     The word2vec similarity matrix indicating the semantic similarity between all pairs of words in 
-    the full PEERS wordpool. The matrix is size 1638 x 1638.
+    the full PEERS wordpool. The matrix is size 1638 x 1638. IMPORTANT: WORD IDs ARE 1-INDEXED AND RANGE FROM 1 TO 1638. To find the values for word n you need to look in row/column n-1 in the matrix if you are using a 0-indexed language like Python, but row/column n if you are using a 1-indexed langauge like MATLAB or R.
     
 - EXP2_VIS.txt and EXP2_AUD.txt:
 
