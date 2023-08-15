@@ -1,6 +1,7 @@
 # Modality Effects in Free Recall: A Retrieved-Context Account
 
 Data and code for:
+
 Pazdera, J. K., &amp; Kahana, M. J. (2023). Modality effects in free recall: A retrieved-context account. _Journal of Experimental Psychology: Learning, Memory, and Cognition_, _49_(6), 866–888. <https://doi.org/10.1037/xlm0001140>
 
 An openly accessible preprint of this paper has also been made available at <https://doi.org/10.31234/osf.io/cxewq>,
